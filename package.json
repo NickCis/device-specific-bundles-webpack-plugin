@@ -1,0 +1,9 @@
+{
+  "name": "device-specific-bundles-webpack-plugin",
+  "version": "0.0.1",
+  "main": "src/DevicePlugin.js",
+  "license": "MIT",
+  "dependencies": {
+    "webpack": "^4.28.1"
+  }
+}
