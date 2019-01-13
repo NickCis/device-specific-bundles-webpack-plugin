@@ -20,7 +20,7 @@ class DeviceModuleFactoryPlugin {
           const [isDeviced, modules] = await this.getDeviceModules(this.devices, data, normalModuleFactory);
 
           if (isDeviced) {
-            callback(null, new DeviceModule(modules, data.context, data.dependencies[0]));
+            callback(null, new DeviceModule(modules, data.context, dependency));
             return;
           }
         }

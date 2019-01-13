@@ -1,8 +1,8 @@
 const Chunk = require('webpack/lib/Chunk');
 const DeviceModule = require('./DeviceModule');
 
-function copyChunk(chunk, device) {
-  const newChunk = new Chunk(`${chunk.name || chunk.id}.${device}`);
+function copyChunk(name, chunk, device) {
+  const newChunk = new Chunk(name);
 
   newChunk.device = device
   newChunk.id = chunk.id;
@@ -36,6 +36,10 @@ function addModules(deviceChunk, chunks, device) {
 }
 
 class DeviceOutputPlugin {
+  constructor(getDeviceChunkName) {
+    this.getDeviceChunkName = getDeviceChunkName;
+  }
+
   apply(compilation) {
     compilation.hooks.beforeHash.tap(
       'DeviceOutputPlugin',
@@ -73,7 +77,7 @@ class DeviceOutputPlugin {
                 const deviceChunk = (
                   deviceChunks[device] =
                     deviceChunks[device]
-                    || copyChunk(chunk, device)
+                    || copyChunk(this.getDeviceChunkName(chunk, device), chunk, device)
                 );
 
                 addModules(deviceChunk, block.chunkGroup.chunks, device);

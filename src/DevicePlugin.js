@@ -7,11 +7,13 @@ const DeviceModuleFactoryPlugin = require('./DeviceModuleFactoryPlugin');
 const DeviceChunkTemplatePlugin = require('./DeviceChunkTemplatePlugin');
 const DeviceOutputPlugin = require('./DeviceOutputPlugin');
 const getDeviceModules = require('./getDeviceModules');
+const getDeviceChunkName = require('./getDeviceChunkName');
 
 class DevicePlugin {
-  constructor({ devices, gdm = getDeviceModules } = {}) {
+  constructor({ devices, gdm = getDeviceModules, gdcn = getDeviceChunkName } = {}) {
     this.devices = devices;
     this.getDeviceModules = gdm;
+    this.getDeviceChunkName = gdcn;
   }
 
   apply(compiler) {
@@ -29,7 +31,7 @@ class DevicePlugin {
           normalModuleFactory
         );
 
-        new DeviceOutputPlugin()
+        new DeviceOutputPlugin(this.getDeviceChunkName)
           .apply(compilation);
       }
     );

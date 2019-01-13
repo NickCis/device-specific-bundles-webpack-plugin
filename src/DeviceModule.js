@@ -39,6 +39,22 @@ class DeviceModule extends Module {
     callback();
   }
 
+  doSource() {
+    if (!this._source) {
+      this._source = `
+var ids = ${JSON.stringify(this.blocks.map(b => b.dependencies[0].module.id))};
+for (var i=0;i<ids.length;i++) {
+  if(__webpack_require__.m[ids[i]]) {
+    module.exports = __webpack_require__(ids[i]);
+    break;
+  }
+}
+      `.trim();
+    }
+
+    return this._source;
+  }
+
   identifier() {
     return this._identifier;
   }
@@ -50,20 +66,12 @@ class DeviceModule extends Module {
   // https://github.com/webpack/webpack/blob/master/lib/ExternalModule.js
   source(dependencyTemplates, runtime) {
     // https://github.com/webpack/webpack/blob/master/lib/RuntimeTemplate.js
-    return `
-var ids = ${JSON.stringify(this.blocks.map(b => b.dependencies[0].module.id))};
-for (var i=0;i<ids.length;i++) {
-  if(__webpack_require__.m[ids[i]]) {
-    module.exports = __webpack_require__(ids[i]);
-    break;
-  }
-}
-    `.trim();
+    return this.doSource();
     // return `module.exports = ${this.name}(__webpack_require__)`;
   }
 
   size() {
-    return 42;
+    return this.doSource().length;
   }
 }
 
