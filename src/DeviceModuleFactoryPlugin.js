@@ -14,14 +14,18 @@ class DeviceModuleFactoryPlugin {
     normalModuleFactory.hooks.factory.tap(
       'DevicePlugin',
       factory => async (data, callback) => {
-        const [isDeviced, modules] = await this.getDeviceModules(this.devices, data, normalModuleFactory);
         const dependency = data.dependencies[0];
 
-        if (isDeviced && !(dependency instanceof DeviceDependency)) {
-          callback(null, new DeviceModule(modules, data.context, data.dependencies[0]));
-        } else {
-          factory(data, callback);
+        if (!(dependency instanceof DeviceDependency)) {
+          const [isDeviced, modules] = await this.getDeviceModules(this.devices, data, normalModuleFactory);
+
+          if (isDeviced) {
+            callback(null, new DeviceModule(modules, data.context, data.dependencies[0]));
+            return;
+          }
         }
+
+        factory(data, callback);
       }
     );
   }
