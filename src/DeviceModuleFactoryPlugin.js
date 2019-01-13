@@ -1,43 +1,27 @@
+'use strict';
+
 const path = require('path');
 const DeviceModule = require('./DeviceModule');
+const DeviceDependency = require('./DeviceDependency');
 
 class DeviceModuleFactoryPlugin {
-  constructor(devices) {
+  constructor(devices, getDeviceModules) {
     this.devices = devices;
+    this.getDeviceModules = getDeviceModules;
   }
 
   apply(normalModuleFactory) {
     normalModuleFactory.hooks.factory.tap(
       'DevicePlugin',
-      factory => (data, callback) => {
-        if (data.request.includes('.APP_TARGET')) {
-          // console.log('<---------factory hooks');
-          // console.log('data', data);
-          const dependency = data.dependencies[0];
-          // console.log('typeof dependency', dependency.constructor.name);
-          // console.log('dependency', dependency);
-          // console.log('dependency.request', dependency.request);
-          // console.log('dependency.getResourceIdentifier()', dependency.getResourceIdentifier());
-          // console.log('dependency.loc', dependency.loc);
-          // console.log('dependency.range', dependency.range);
+      factory => async (data, callback) => {
+        const [isDeviced, modules] = await this.getDeviceModules(this.devices, data, normalModuleFactory);
+        const dependency = data.dependencies[0];
 
-          // console.log('> ------- relative', relative);
-
-          // const fullPath = path.resolve(data.context, data.request).replace('.APP_TARGET', '');
-          // const relative = path.relative(this.context, fullPath);
-          // const name = `plugin_${relative.replace(/\//g, '_')}`;
-          const module = new DeviceModule(this.devices, data.context, dependency);
-          // console.log('module', module);
-          return callback(null, module);
+        if (isDeviced && !(dependency instanceof DeviceDependency)) {
+          callback(null, new DeviceModule(modules, data.context, data.dependencies[0]));
+        } else {
+          factory(data, callback);
         }
-
-        factory(data, (err, module) => {
-          // console.log('<---------factory hooks');
-          // console.log('data', data);
-          // console.log('err', err);
-          // console.log('module', module);
-          callback(err, module);
-        });
       }
     );
   }

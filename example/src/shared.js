@@ -1,1 +1,3 @@
-module.exports = 'shared';
+const text = 'shared';
+
+export default text;

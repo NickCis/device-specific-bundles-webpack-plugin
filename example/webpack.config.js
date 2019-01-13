@@ -7,9 +7,11 @@ module.exports = {
     minimize: false,
   },
   plugins: [
-    new DevicePlugin([
-      'desktop',
-      'mobile'
-    ]),
+    new DevicePlugin({
+      devices: [
+        'desktop',
+        'mobile'
+      ]
+    }),
   ]
 };

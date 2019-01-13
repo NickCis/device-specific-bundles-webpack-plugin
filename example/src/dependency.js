@@ -1,1 +1,3 @@
-module.exports = 'text a';
+const text = 'text a';
+
+export default text;

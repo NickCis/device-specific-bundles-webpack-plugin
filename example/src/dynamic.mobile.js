@@ -1,3 +1,4 @@
-const shared = require('./shared');
+import shared from './shared';
+const text = `${shared} - mobile`;
 
-module.exports = `${shared} - dynamic`;
+export default text;
